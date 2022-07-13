@@ -7,6 +7,18 @@ import LogoutIcon from "@mui/icons-material/ExitToApp";
 import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
+import { signOut } from "firebase/auth";
+import { auth, db } from "../config/firebase";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import TextField from "@mui/material/TextField";
+import DialogActions from "@mui/material/DialogActions";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useState } from "react";
+import EmailValidator from "email-validator";
+import { addDoc, collection } from "firebase/firestore";
 
 const StyledContainer = styled.div`
   height: 100vh;
@@ -57,11 +69,51 @@ const StyledUserAvatar = styled(Avatar)`
 `;
 
 const Sidebar = () => {
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.log("ERROR SIGN OUT", error);
+    }
+  };
+
+  const [loggedInUser, _loading, _error] = useAuthState(auth);
+
+  const [isOpenNewConversationDialog, setIsOpenNewConversationDialog] =
+    useState(false);
+
+  const [recipentEmail, setRecipentEmail] = useState("");
+
+  const toggleNewConversationDialog = (isOpen: boolean) => {
+    setIsOpenNewConversationDialog(isOpen);
+
+    if (!isOpen) setRecipentEmail("");
+  };
+
+  const closeNewOpenConversationDialog = () => {
+    toggleNewConversationDialog(false);
+  };
+
+  const isInvitingSelf = recipentEmail === loggedInUser?.email;
+
+  const createConversation = async () => {
+    if (!recipentEmail) return;
+
+    if (EmailValidator.validate(recipentEmail) && !isInvitingSelf) {
+      //Add conversation user to db 'conversations' collections
+
+      await addDoc(collection(db, "conversations"), {
+        users: [loggedInUser?.email, recipentEmail],
+      });
+    }
+    closeNewOpenConversationDialog();
+  };
+
   return (
     <StyledContainer>
       <StyledHeader>
-        <Tooltip title="USER EMAIL" placement="right">
-          <StyledUserAvatar />
+        <Tooltip title={loggedInUser?.email as string} placement="right">
+          <StyledUserAvatar src={loggedInUser?.photoURL || ""} />
         </Tooltip>
         <div>
           <IconButton>
@@ -70,7 +122,7 @@ const Sidebar = () => {
           <IconButton>
             <MoreVerticalIcon />
           </IconButton>
-          <IconButton>
+          <IconButton onClick={logout}>
             <LogoutIcon />
           </IconButton>
         </div>
@@ -79,7 +131,43 @@ const Sidebar = () => {
         <SearchIcon />
         <StyledSearchInput placeholder="Search in conversations" />
       </StyledSearch>
-      <StyledSidebarButton>Start a new conversation</StyledSidebarButton>
+      <StyledSidebarButton
+        onClick={() => {
+          toggleNewConversationDialog(true);
+        }}
+      >
+        Start a new conversation
+      </StyledSidebarButton>
+
+      {/* Lists of conversations */}
+
+      <Dialog
+        open={isOpenNewConversationDialog}
+        onClose={closeNewOpenConversationDialog}
+      >
+        <DialogTitle>New Conversation</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please enter a Google email address for the user you wish to chat
+            with
+          </DialogContentText>
+          <TextField
+            autoFocus
+            label="Email Address"
+            type="email"
+            fullWidth
+            variant="standard"
+            value={recipentEmail}
+            onChange={(e) => setRecipentEmail(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeNewOpenConversationDialog}>Cancel</Button>
+          <Button disabled={!recipentEmail} onClick={createConversation}>
+            Create
+          </Button>
+        </DialogActions>
+      </Dialog>
     </StyledContainer>
   );
 };
