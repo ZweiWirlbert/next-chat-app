@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useRecipient } from "../hooks/useRecipient";
 import { Conversation } from "../types";
@@ -24,8 +25,14 @@ export const ConversationSelect = ({
 }) => {
   const { recipient, recipientEmail } = useRecipient(conversationUsers);
 
+  const router = useRouter();
+
+  const onSelectConversation = () => {
+    router.push(`/conversations/${id}`);
+  };
+
   return (
-    <StyledContainer>
+    <StyledContainer onClick={onSelectConversation}>
       <RecipientAvatar recipient={recipient} recipientEmail={recipientEmail} />
       <span>{recipientEmail}</span>
     </StyledContainer>
