@@ -18,7 +18,9 @@ import DialogActions from "@mui/material/DialogActions";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useState } from "react";
 import EmailValidator from "email-validator";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, query, where } from "firebase/firestore";
+import { useCollection } from "react-firebase-hooks/firestore";
+import { Conversation } from "../types";
 
 const StyledContainer = styled.div`
   height: 100vh;
@@ -82,28 +84,47 @@ const Sidebar = () => {
   const [isOpenNewConversationDialog, setIsOpenNewConversationDialog] =
     useState(false);
 
-  const [recipentEmail, setRecipentEmail] = useState("");
+  const [recipientEmail, setRecipientEmail] = useState("");
 
   const toggleNewConversationDialog = (isOpen: boolean) => {
     setIsOpenNewConversationDialog(isOpen);
 
-    if (!isOpen) setRecipentEmail("");
+    if (!isOpen) setRecipientEmail("");
   };
 
   const closeNewOpenConversationDialog = () => {
     toggleNewConversationDialog(false);
   };
 
-  const isInvitingSelf = recipentEmail === loggedInUser?.email;
+  // check if conversation is already exists between the current user and recipient
+  const queryGetConversationsForCurrentUser = query(
+    collection(db, "conversations"),
+    where("users", "array-contains", loggedInUser?.email)
+  );
+  const [conversationsSnapshot, __loading, __error] = useCollection(
+    queryGetConversationsForCurrentUser
+  );
+
+  const isConversationAlreadyExists = (recipientEmail: string) => {
+    return conversationsSnapshot?.docs.find((conversation) =>
+      (conversation.data() as Conversation).users.includes(recipientEmail)
+    );
+  };
+
+  const isInvitingSelf = recipientEmail === loggedInUser?.email;
 
   const createConversation = async () => {
-    if (!recipentEmail) return;
+    if (!recipientEmail) return;
 
-    if (EmailValidator.validate(recipentEmail) && !isInvitingSelf) {
+    if (
+      EmailValidator.validate(recipientEmail) &&
+      !isInvitingSelf &&
+      !isConversationAlreadyExists(recipientEmail)
+    ) {
       //Add conversation user to db 'conversations' collections
 
       await addDoc(collection(db, "conversations"), {
-        users: [loggedInUser?.email, recipentEmail],
+        users: [loggedInUser?.email, recipientEmail],
       });
     }
     closeNewOpenConversationDialog();
@@ -157,13 +178,13 @@ const Sidebar = () => {
             type="email"
             fullWidth
             variant="standard"
-            value={recipentEmail}
-            onChange={(e) => setRecipentEmail(e.target.value)}
+            value={recipientEmail}
+            onChange={(e) => setRecipientEmail(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={closeNewOpenConversationDialog}>Cancel</Button>
-          <Button disabled={!recipentEmail} onClick={createConversation}>
+          <Button disabled={!recipientEmail} onClick={createConversation}>
             Create
           </Button>
         </DialogActions>
