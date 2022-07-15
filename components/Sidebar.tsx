@@ -21,6 +21,7 @@ import EmailValidator from "email-validator";
 import { addDoc, collection, query, where } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { Conversation } from "../types";
+import { ConversationSelect } from "./ConversationSelect";
 
 const StyledContainer = styled.div`
   height: 100vh;
@@ -129,66 +130,73 @@ const Sidebar = () => {
     }
     closeNewOpenConversationDialog();
   };
-
   return (
     <StyledContainer>
-      <StyledHeader>
-        <Tooltip title={loggedInUser?.email as string} placement="right">
-          <StyledUserAvatar src={loggedInUser?.photoURL || ""} />
-        </Tooltip>
-        <div>
-          <IconButton>
-            <ChatIcon />
-          </IconButton>
-          <IconButton>
-            <MoreVerticalIcon />
-          </IconButton>
-          <IconButton onClick={logout}>
-            <LogoutIcon />
-          </IconButton>
-        </div>
-      </StyledHeader>
-      <StyledSearch>
-        <SearchIcon />
-        <StyledSearchInput placeholder="Search in conversations" />
-      </StyledSearch>
-      <StyledSidebarButton
-        onClick={() => {
-          toggleNewConversationDialog(true);
-        }}
-      >
-        Start a new conversation
-      </StyledSidebarButton>
-
-      {/* Lists of conversations */}
-
-      <Dialog
-        open={isOpenNewConversationDialog}
-        onClose={closeNewOpenConversationDialog}
-      >
-        <DialogTitle>New Conversation</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Please enter a Google email address for the user you wish to chat
-            with
-          </DialogContentText>
-          <TextField
-            autoFocus
-            label="Email Address"
-            type="email"
-            fullWidth
-            variant="standard"
-            value={recipientEmail}
-            onChange={(e) => setRecipientEmail(e.target.value)}
+      <>
+        <StyledHeader>
+          <Tooltip title={loggedInUser?.email as string} placement="right">
+            <StyledUserAvatar src={loggedInUser?.photoURL || ""} />
+          </Tooltip>
+          <div>
+            <IconButton>
+              <ChatIcon />
+            </IconButton>
+            <IconButton>
+              <MoreVerticalIcon />
+            </IconButton>
+            <IconButton onClick={logout}>
+              <LogoutIcon />
+            </IconButton>
+          </div>
+        </StyledHeader>
+        <StyledSearch>
+          <SearchIcon />
+          <StyledSearchInput placeholder="Search in conversations" />
+        </StyledSearch>
+        <StyledSidebarButton
+          onClick={() => {
+            toggleNewConversationDialog(true);
+          }}
+        >
+          Start a new conversation
+        </StyledSidebarButton>
+        {/* Lists of conversations */}
+        {conversationsSnapshot?.docs?.map((conversation) => (
+          <ConversationSelect
+            key={conversation.id}
+            id={conversation.id}
+            conversationUsers={(conversation?.data() as Conversation)?.users}
           />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeNewOpenConversationDialog}>Cancel</Button>
-          <Button disabled={!recipientEmail} onClick={createConversation}>
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
+        ))}
+
+        <Dialog
+          open={isOpenNewConversationDialog}
+          onClose={closeNewOpenConversationDialog}
+        >
+          <DialogTitle>New Conversation</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Please enter a Google email address for the user you wish to chat
+              with
+            </DialogContentText>
+            <TextField
+              autoFocus
+              label="Email Address"
+              type="email"
+              fullWidth
+              variant="standard"
+              value={recipientEmail}
+              onChange={(e) => setRecipientEmail(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeNewOpenConversationDialog}>Cancel</Button>
+            <Button disabled={!recipientEmail} onClick={createConversation}>
+              Create
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </>
     </StyledContainer>
   );
 };
