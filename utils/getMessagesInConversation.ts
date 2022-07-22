@@ -1,6 +1,5 @@
 import {
   collection,
-  DocumentData,
   orderBy,
   query,
   QueryDocumentSnapshot,
@@ -18,17 +17,15 @@ export const generateQueryGetMessages = (conversationId?: string) => {
   );
 };
 
-export const transfromMessage = (
-  message: QueryDocumentSnapshot<DocumentData>
-) =>
+export const transformMessage = (message: QueryDocumentSnapshot) =>
   ({
     id: message.id,
     ...message.data(),
     sent_at: message.data().sent_at
-      ? convertFirestoreTimetampToDate(message.data().sent_at)
+      ? convertFirestoreTimestampToDate(message.data().sent_at)
       : null,
   } as IMessage);
 
-export const convertFirestoreTimetampToDate = (timestamp: Timestamp) => {
+export const convertFirestoreTimestampToDate = (timestamp: Timestamp) => {
   return new Date(timestamp.toDate().getTime()).toLocaleString();
 };

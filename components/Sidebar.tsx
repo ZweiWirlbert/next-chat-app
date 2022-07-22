@@ -28,8 +28,9 @@ const StyledContainer = styled.div`
   min-width: 300px;
   max-width: 350px;
   overflow-y: scroll;
-  border-right: 1px solid whitesmoke;
+  border-right: 2px solid whitesmoke;
   /* Hide scrollbar for Chrome, Safari and Opera */
+
   ::-webkit-scrollbar {
     display: none;
   }
@@ -74,6 +75,7 @@ const StyledSidebarButton = styled(Button)`
 
 const StyledUserAvatar = styled(Avatar)`
   cursor: pointer;
+
   :hover {
     opacity: 0.8;
   }
