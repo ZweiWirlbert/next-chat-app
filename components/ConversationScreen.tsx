@@ -149,8 +149,6 @@ const ConversationScreen = ({ conversation, messages }: { conversation: Conversa
     }
   };
 
-  console.log(loggedInUser?.email);
-
   const addMessageToDbAndUpdateLastSeen = async () => {
     // update your last seen when you send a message
     await setDoc(
@@ -197,7 +195,7 @@ const ConversationScreen = ({ conversation, messages }: { conversation: Conversa
       <StyledRecipientHeader>
         <RecipientAvatar recipient={recipient} recipientEmail={recipientEmail} />
         <StyledHeaderInfo>
-          <StyledH3>{recipientEmail}</StyledH3>
+          <StyledH3>{recipient?.displayName ? recipient.displayName : recipientEmail}</StyledH3>
           {recipient && <span>Last active: {convertFirestoreTimestampToDate(recipient.lastSeen)}</span>}
         </StyledHeaderInfo>
         <StyledHeaderIcon>

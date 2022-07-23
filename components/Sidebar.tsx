@@ -1,27 +1,27 @@
-import Avatar from "@mui/material/Avatar";
-import Tooltip from "@mui/material/Tooltip";
-import styled from "styled-components";
-import ChatIcon from "@mui/icons-material/Chat";
-import MoreVerticalIcon from "@mui/icons-material/MoreVert";
-import LogoutIcon from "@mui/icons-material/ExitToApp";
-import SearchIcon from "@mui/icons-material/Search";
-import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
-import { signOut } from "firebase/auth";
-import { auth, db } from "../config/firebase";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import TextField from "@mui/material/TextField";
-import DialogActions from "@mui/material/DialogActions";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useState } from "react";
-import EmailValidator from "email-validator";
-import { addDoc, collection, query, where } from "firebase/firestore";
-import { useCollection } from "react-firebase-hooks/firestore";
-import { Conversation } from "../types";
-import { ConversationSelect } from "./ConversationSelect";
+import Avatar from '@mui/material/Avatar';
+import Tooltip from '@mui/material/Tooltip';
+import styled from 'styled-components';
+import ChatIcon from '@mui/icons-material/Chat';
+import MoreVerticalIcon from '@mui/icons-material/MoreVert';
+import LogoutIcon from '@mui/icons-material/ExitToApp';
+import SearchIcon from '@mui/icons-material/Search';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import { signOut } from 'firebase/auth';
+import { auth, db } from '../config/firebase';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import TextField from '@mui/material/TextField';
+import DialogActions from '@mui/material/DialogActions';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useState } from 'react';
+import EmailValidator from 'email-validator';
+import { addDoc, collection, query, where } from 'firebase/firestore';
+import { useCollection } from 'react-firebase-hooks/firestore';
+import { Conversation } from '../types';
+import { ConversationSelect } from './ConversationSelect';
 
 const StyledContainer = styled.div`
   height: 100vh;
@@ -86,21 +86,20 @@ const Sidebar = () => {
     try {
       await signOut(auth);
     } catch (error) {
-      console.log("ERROR SIGN OUT", error);
+      console.log('ERROR SIGN OUT', error);
     }
   };
 
   const [loggedInUser, _loading, _error] = useAuthState(auth);
 
-  const [isOpenNewConversationDialog, setIsOpenNewConversationDialog] =
-    useState(false);
+  const [isOpenNewConversationDialog, setIsOpenNewConversationDialog] = useState(false);
 
-  const [recipientEmail, setRecipientEmail] = useState("");
+  const [recipientEmail, setRecipientEmail] = useState('');
 
   const toggleNewConversationDialog = (isOpen: boolean) => {
     setIsOpenNewConversationDialog(isOpen);
 
-    if (!isOpen) setRecipientEmail("");
+    if (!isOpen) setRecipientEmail('');
   };
 
   const closeNewOpenConversationDialog = () => {
@@ -109,12 +108,10 @@ const Sidebar = () => {
 
   // check if conversation is already exists between the current user and recipient
   const queryGetConversationsForCurrentUser = query(
-    collection(db, "conversations"),
-    where("users", "array-contains", loggedInUser?.email)
+    collection(db, 'conversations'),
+    where('users', 'array-contains', loggedInUser?.email)
   );
-  const [conversationsSnapshot, __loading, __error] = useCollection(
-    queryGetConversationsForCurrentUser
-  );
+  const [conversationsSnapshot, __loading, __error] = useCollection(queryGetConversationsForCurrentUser);
 
   const isConversationAlreadyExists = (recipientEmail: string) => {
     return conversationsSnapshot?.docs.find((conversation) =>
@@ -127,14 +124,10 @@ const Sidebar = () => {
   const createConversation = async () => {
     if (!recipientEmail) return;
 
-    if (
-      EmailValidator.validate(recipientEmail) &&
-      !isInvitingSelf &&
-      !isConversationAlreadyExists(recipientEmail)
-    ) {
+    if (EmailValidator.validate(recipientEmail) && !isInvitingSelf && !isConversationAlreadyExists(recipientEmail)) {
       //Add conversation user to db 'conversations' collections
 
-      await addDoc(collection(db, "conversations"), {
+      await addDoc(collection(db, 'conversations'), {
         users: [loggedInUser?.email, recipientEmail],
       });
     }
@@ -144,8 +137,8 @@ const Sidebar = () => {
     <StyledContainer>
       <>
         <StyledHeader>
-          <Tooltip title={loggedInUser?.email as string} placement="right">
-            <StyledUserAvatar src={loggedInUser?.photoURL || ""} />
+          <Tooltip title={loggedInUser?.displayName as string} placement="right">
+            <StyledUserAvatar src={loggedInUser?.photoURL || ''} />
           </Tooltip>
           <div>
             <IconButton>
@@ -179,15 +172,11 @@ const Sidebar = () => {
           />
         ))}
 
-        <Dialog
-          open={isOpenNewConversationDialog}
-          onClose={closeNewOpenConversationDialog}
-        >
+        <Dialog open={isOpenNewConversationDialog} onClose={closeNewOpenConversationDialog}>
           <DialogTitle>New Conversation</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Please enter a Google email address for the user you wish to chat
-              with
+              Please enter a Google email address for the user you wish to chat with
             </DialogContentText>
             <TextField
               autoFocus

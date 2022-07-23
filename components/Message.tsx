@@ -76,7 +76,7 @@ const Message = ({
   return (
     <StyledMessageContainer style={{ display: 'flex' }}>
       {!isSender && recipientEmail && (
-        <MessageTooltip title={recipientEmail} placement="left">
+        <MessageTooltip title={recipient?.displayName ? recipient.displayName : recipientEmail} placement="left">
           <div>
             <RecipientAvatar recipient={recipient} recipientEmail={recipientEmail} />
           </div>

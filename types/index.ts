@@ -1,10 +1,11 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from 'firebase/firestore';
 
 export interface Conversation {
   users: string[];
 }
 
 export interface AppUser {
+  displayName: string;
   email: string;
   lastSeen: Timestamp;
   photoUrl: string;

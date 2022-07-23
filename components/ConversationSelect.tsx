@@ -1,8 +1,8 @@
-import { useRouter } from "next/router";
-import styled from "styled-components";
-import { useRecipient } from "../hooks/useRecipient";
-import { Conversation } from "../types";
-import RecipientAvatar from "./RecipientAvatar";
+import { useRouter } from 'next/router';
+import styled from 'styled-components';
+import { useRecipient } from '../hooks/useRecipient';
+import { Conversation } from '../types';
+import RecipientAvatar from './RecipientAvatar';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -21,7 +21,7 @@ export const ConversationSelect = ({
   conversationUsers,
 }: {
   id: string;
-  conversationUsers: Conversation["users"];
+  conversationUsers: Conversation['users'];
 }) => {
   const { recipient, recipientEmail } = useRecipient(conversationUsers);
 
@@ -34,7 +34,7 @@ export const ConversationSelect = ({
   return (
     <StyledContainer onClick={onSelectConversation}>
       <RecipientAvatar recipient={recipient} recipientEmail={recipientEmail} />
-      <span>{recipientEmail}</span>
+      <span>{recipient?.displayName ? recipient.displayName : recipientEmail}</span>
     </StyledContainer>
   );
 };
