@@ -6,6 +6,7 @@ import { auth, db } from '../config/firebase';
 import Loading from '../components/Loading';
 import { useEffect } from 'react';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import Layout from '../components/Layout';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [loggedInUser, loading, _err] = useAuthState(auth);
@@ -41,7 +42,11 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   if (!loggedInUser) return <Login />;
 
-  return <Component {...pageProps} />;
+  return (
+    <Layout>
+      <Component {...pageProps} />
+    </Layout>
+  );
 }
 
 export default MyApp;

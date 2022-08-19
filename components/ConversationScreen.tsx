@@ -190,6 +190,7 @@ const ConversationScreen = ({ conversation, messages }: { conversation: Conversa
   useLayoutEffect(() => {
     scrollToBottom();
   }, [messagesSnapshot]);
+
   return (
     <>
       <StyledRecipientHeader>

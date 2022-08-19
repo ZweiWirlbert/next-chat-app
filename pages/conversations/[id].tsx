@@ -4,15 +4,10 @@ import Head from 'next/head';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import styled from 'styled-components';
 import ConversationScreen from '../../components/ConversationScreen';
-import Sidebar from '../../components/Sidebar';
 import { auth, db } from '../../config/firebase';
 import { Conversation, IMessage } from '../../types';
 import { generateQueryGetMessages, transformMessage } from '../../utils/getMessagesInConversation';
 import { getRecipientEmail } from '../../utils/getRecipientEmail';
-
-const StyledContainer = styled.div`
-  display: flex;
-`;
 
 const StyledConversationContainer = styled.div`
   flex-grow: 1;
@@ -40,21 +35,15 @@ const Conversations: NextPage<Props> = ({ conversation, messages }) => {
   const currentRecipientEmail = getRecipientEmail(conversation?.users, loggedInUser);
 
   return (
-    <StyledContainer>
+    <>
       <Head>
         <title>Conversation with {currentRecipientEmail}</title>
       </Head>
 
-      <Sidebar />
-      {/* <div>
-        {messages.map((message) => {
-          return <p key={message.id}>{JSON.stringify(message)}</p>;
-        })}
-      </div> */}
       <StyledConversationContainer>
         <ConversationScreen conversation={conversation} messages={messages} />
       </StyledConversationContainer>
-    </StyledContainer>
+    </>
   );
 };
 
